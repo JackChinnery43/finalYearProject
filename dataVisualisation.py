@@ -39,8 +39,12 @@ st.set_page_config(
 class Prediction:
     def dataSource(self):
         # original dataset including stock price and sentiment score on an hourly basis - 13288 rows
-        data = pd.read_csv('combinedData.csv')
-        return data
+        self.original_data = pd.read_csv('combinedData.csv')
+        return self.original_data
+
+    def sentimentAnalysis(self):
+        self.sentiment_data = pd.read_csv('combinedData.csv', index_col='date')
+        return self.sentiment_data
 
     def chooseFeatures(self):
         features_available = pd.DataFrame(self.data[['Open', 'High', 'Low', 'Close', 'High/Low_%', '%_Change_Open_Close', 'compound', 'negative', 'neutral', 'positive']])
@@ -132,7 +136,6 @@ class Prediction:
         # combine both data frames
         self.data_with_predictions = pd.concat([self.data, self.models_predictions_dataframe], axis=1)
         self.data_with_predictions = self.data_with_predictions.set_index('date')
-        self.data.set_index('date')
 
         # find the average weekly predicted and actual values. (168 = 24 * 7) - use to view the general trend
         self.model_prediction_dataframe_avg = self.models_predictions_dataframe.rolling(window=168).mean()
@@ -142,8 +145,9 @@ class Prediction:
         self.validation_and_predictions_dataframe = pd.concat([self.models_predictions_dataframe, self.X_features_validation_dataset_series_close], axis=1)
         # dataframe storing the 7 day average model predicted close price and the validation (actual) close price
         self.validation_and_predictions_average_dataframe = pd.concat([self.model_prediction_dataframe_avg, self.X_features_validation_dataset_series_close_avg], axis=1)
-        self.validation_and_predictions_average_dataframe.columns = ['Model Results (Predictions)', 'Actual Close Price']
+        self.validation_and_predictions_average_dataframe.columns = ['Model Results (Predictions)', 'Validation (Actual_Close_Price)']
 
+        # regression evaluation metrics
         self.r2Score = r2_score(self.X_features_validation_dataset_series_close, self.model_predictions)
         self.meanAbsoluteError = mean_absolute_error(self.X_features_validation_dataset_series_close, self.model_predictions)
         self.meanSquaredError = mean_squared_error(self.X_features_validation_dataset_series_close, self.model_predictions)
@@ -153,6 +157,7 @@ class Prediction:
 def main():
     controller = Prediction()
     controller.data = controller.dataSource()
+    controller.sentiment = controller.sentimentAnalysis()
     st.title("Machine Learning - Bitcoin Price Prediction")
     pathfile = st.sidebar.selectbox("Project Areas", ["Summary", "Project Data", "Sentiment Analysis", "Machine Learning"])
 
@@ -193,15 +198,15 @@ def main():
         st.write("Sentiment Analysis")
         sentiment_col1, sentiment_col2 = st.beta_columns(2)
         with sentiment_col1:
-            sentiment_score_avg = px.line(controller.data['compound'].rolling(window=720).mean())
-            sentiment_score_avg.update_layout(width=600, title="VADER Sentiment Score - Monthly Average")
+            sentiment_score_avg = px.line(controller.sentiment_data['compound'].rolling(window=720).mean())
+            sentiment_score_avg.update_layout(width=600, title="VADER Sentiment Score - Monthly Average", legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
             st.plotly_chart(sentiment_score_avg)
         with sentiment_col2:
-            close_price_avg = px.line(controller.data['Close'].rolling(window=720).mean())
-            close_price_avg.update_layout(width=600, title="Bitcoin Close Price - Monthly Average")
+            close_price_avg = px.line(controller.sentiment_data['Close'].rolling(window=720).mean())
+            close_price_avg.update_layout(width=600, title="Bitcoin Close Price - Monthly Average", legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
             st.plotly_chart(close_price_avg)
         st.write("Correlational Analysis - key findings: ")
-        st.write("  -  In September 2018 the sentiment score begins to decrease from 0.05, to 0.03 in December 2018. This decrease is matched in Bitcoin's market price, which started at over $7000 in September 2018, and decreased to below $4000 in December 2018.")
+        st.write("  -  In 30th August 2018 the sentiment score begins to decrease, from 0.05, to 0.03 in December 2018. This decrease is matched in Bitcoin's market price, which started at over $6000 in September 2018, and decreased to below $4000 in December 2018.")
         st.write("  -  In January 2019 public sentiment appears to become more positive, with the sentiment score beginning at 0.04 and steadily increasing through to April 2019. Bitcoin's price also begins to slightly increase, from $3000 in January 2019 to around $4000 in April 2019.")
         st.write("  -  In April 2019 public sentiment becomes more positive, increasing continuously until mid-July. This again is matched in Bitcoin's price, which increased from April 2019 to July 2019.")
         st.write("  -  Both the sentiment score and stock market price begin to drop in August 2019, before picking up again November 2019.")
