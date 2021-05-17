@@ -1,1 +1,1 @@
-web: gunicorn dataVisualisation:main
+web: sh setup.sh && streamlit run dataVisualisation.py
