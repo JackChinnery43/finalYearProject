@@ -1,1 +1,1 @@
-web: gunicorn dataVisualisation.py:main
+web: gunicorn dataVisualisation:main
