@@ -131,10 +131,6 @@ smmap==4.0.0
 soupsieve==2.0.1
 statsmodels==0.12.2
 streamlit==0.80.0
-tensorboard==2.4.1
-tensorboard-plugin-wit==1.8.0
-tensorflow==2.4.1
-tensorflow-estimator==2.4.0
 termcolor==1.1.0
 terminado==0.9.4
 testpath==0.4.4
@@ -160,4 +156,3 @@ widgetsnbextension==3.5.1
 wrapt==1.12.1
 yarl==1.6.0
 yfinance==0.1.55
-
