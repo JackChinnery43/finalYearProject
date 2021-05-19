@@ -8,39 +8,51 @@ from matplotlib.gridspec import GridSpec
 import datetime as dt
 from dateutil import parser
 
-# forex trading historical data 
-bitcoin_market_data = pd.read_csv('bitcoinHistoricalData.csv')
+class marketData:
 
-# create a new column 'date' to store the Timestamp column data, but coverted to datetime format
-# then set the new date column to be the index
-bitcoin_market_data['date'] = pd.to_datetime(bitcoin_market_data.Timestamp, unit='s')
-bitcoin_market_data = bitcoin_market_data.sort_values(by='date')
-bitcoin_market_data = bitcoin_market_data.set_index('date')
+    def loadMarketData(self):
+        # forex trading historical data 
+        self.bitcoin_market_data = pd.read_csv('datasets/bitcoinHistoricalData.csv')
 
-# set the datetime range in line with the historical tweets dataframe
-start_date = '2018-05-19 00:00:00'
-end_date = '2019-11-23 23:59:00'
-bitcoin_market_data = bitcoin_market_data.loc[start_date : end_date]
+        # create a new column 'date' to store the Timestamp column data, but coverted to datetime format
+        # then set the new date column to be the index
+        self.bitcoin_market_data['date'] = pd.to_datetime(self.bitcoin_market_data.Timestamp, unit='s')
+        self.bitcoin_market_data = self.bitcoin_market_data.sort_values(by='date')
+        self.bitcoin_market_data = self.bitcoin_market_data.set_index('date')
 
-# resample data from one minute to one hour
-bitcoin_market_data = bitcoin_market_data.resample('60T').mean()
+        # set the datetime range in line with the historical tweets dataframe
+        start_date = '2018-05-19 00:00:00'
+        end_date = '2019-11-23 23:59:00'
+        self.bitcoin_market_data = self.bitcoin_market_data.loc[start_date : end_date]
 
-# remove columns with non-related data
-bitcoin_market_data.drop(['Timestamp', 'Weighted_Price'], axis=1, inplace=True)
+        # resample data from one minute to one hour
+        self.bitcoin_market_data = self.bitcoin_market_data.resample('60T').mean()
 
-# rename required columns
-bitcoin_market_data.columns = ['Open', 'High', 'Low', 'Close', 'Volume_(BTC)', 'Volume_(Currency)']
+        # remove columns with non-related data
+        self.bitcoin_market_data.drop(['Timestamp', 'Weighted_Price'], axis=1, inplace=True)
 
-# new column to store the high/low %
-bitcoin_market_data['High/Low_%'] = (bitcoin_market_data['High'] - bitcoin_market_data['Low']) / bitcoin_market_data['Close'] * 100
-# new column to store the percentage change between open and close
-bitcoin_market_data['%_Change_Open_Close'] = (bitcoin_market_data['Close'] - bitcoin_market_data['Open']) / bitcoin_market_data['Open'] * 100
+        # rename required columns
+        self.bitcoin_market_data.columns = ['Open', 'High', 'Low', 'Close', 'Volume_(BTC)', 'Volume_(Currency)']
 
-bitcoin_market_data['Close'].plot()
-plt.title('Daily Close Market Value for Bitcoin (BTC)')
-plt.tight_layout()
-plt.grid()
+        # new column to store the high/low %
+        self.bitcoin_market_data['%_Change_High_Low'] = (self.bitcoin_market_data['High'] - self.bitcoin_market_data['Low']) / self.bitcoin_market_data['Close'] * 100
+        # new column to store the percentage change between open and close
+        self.bitcoin_market_data['%_Change_Open_Close'] = (self.bitcoin_market_data['Close'] - self.bitcoin_market_data['Open']) / self.bitcoin_market_data['Open'] * 100
 
-bitcoin_market_data.to_csv('bitcoinMarketDataHour.csv')
-print(bitcoin_market_data)
+        self.bitcoin_market_data['Close'].plot()
+        plt.title('Daily Close Market Value for Bitcoin (BTC)')
+        plt.tight_layout()
+        plt.grid()
 
+        self.bitcoin_market_data.to_csv('datasets/finalBitcoinMarketDataHour.csv')
+        print(" ")
+        print(self.bitcoin_market_data)
+
+        return self.bitcoin_market_data
+
+def main():
+    controller = marketData()
+    controller.historicalBitcoinMarketData = controller.loadMarketData()
+
+if __name__ == "__main__":
+	main()

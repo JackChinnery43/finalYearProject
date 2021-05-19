@@ -36,14 +36,14 @@ st.set_page_config(
     layout="wide",
     )
 
-class Prediction:
+class BitcoinPrediction:
     def dataSource(self):
         # original dataset including stock price and sentiment score on an hourly basis - 13288 rows
-        self.original_data = pd.read_csv('combinedData.csv')
+        self.original_data = pd.read_csv('datasets/combinedData.csv')
         return self.original_data
 
     def sentimentAnalysis(self):
-        self.sentiment_data = pd.read_csv('combinedData.csv', index_col='date')
+        self.sentiment_data = pd.read_csv('datasets/combinedData.csv.csv', index_col='date')
         return self.sentiment_data
 
     def chooseFeatures(self):
@@ -54,7 +54,7 @@ class Prediction:
         self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'SVM Regressor', 'Gradient Boosting Regressor'))
 
     def loadModelData(self):
-        data = pd.read_csv('combinedData.csv')
+        data = pd.read_csv('datasets/combinedData.csv.csv')
         # store close price and sentiment score in a dataframe
         machine_learning_df = self.data[self.feature_selection]
         # split_data 10% equates to 1329 (10% of 13288)
@@ -84,7 +84,7 @@ class Prediction:
         # y_test = 2392 rows (20% of 11959)
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X_features_scaled, y_target, test_size = 0.2)
 
-    def modelPredictions(self, predict_btn):
+    def modelPredictions(self, predictButton):
         # array to store the models prediction results
         self.models_results = []
         if self.machine_learning_selection == 'Linear Regression':
@@ -155,7 +155,7 @@ class Prediction:
         return self.models_predictions_dataframe, self.model_predictions, self.models_results, self.accuracy, self.data_with_predictions, self.validation_and_predictions_dataframe, self.validation_and_predictions_average_dataframe, self.r2Score, self.meanAbsoluteError, self.meanSquaredError
 
 def main():
-    controller = Prediction()
+    controller = BitcoinPrediction()
     controller.data = controller.dataSource()
     controller.sentiment = controller.sentimentAnalysis()
     st.title("Machine Learning - Bitcoin Price Prediction")
@@ -216,10 +216,10 @@ def main():
         controller.chooseMachineLearningModel()
         controller.chooseFeatures()
         if len(controller.feature_selection) >= 1:
-            predict_btn = st.button('Predict')
+            predictButton = st.button('Predict')
             controller.loadModelData()
-            if predict_btn:
-                models_predictions_dataframe, model_predictions, models_results, accuracy, data_with_predictions, validation_and_predictions_dataframe, validation_and_predictions_average_dataframe, r2score, meanAbsoluteError, meanSquaredError = controller.modelPredictions(predict_btn)
+            if predictButton:
+                models_predictions_dataframe, model_predictions, models_results, accuracy, data_with_predictions, validation_and_predictions_dataframe, validation_and_predictions_average_dataframe, r2score, meanAbsoluteError, meanSquaredError = controller.modelPredictions(predictButton)
                 st.write("Model accuracy on test/train data: ", accuracy * 100, "%")
                 st.write("Model r2 Score for future predictions: ", r2score)
                 st.write("Model Mean Absolute Error for future predictions: ", meanAbsoluteError)

@@ -11,7 +11,7 @@ import nltk
 nltk.download('vader_lexicon')
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
-df = pd.read_csv('tweets.csv', delimiter=';', skiprows=0, lineterminator='\n')
+df = pd.read_csv('datasets/originalTweets.csv', delimiter=';', skiprows=0, lineterminator='\n')
 
 df['date'] = pd.to_datetime(df['timestamp']).dt.tz_convert(None)
 df = df.sort_values(by='date')
@@ -53,7 +53,7 @@ df['positive'] = [analyser.polarity_scores(i)['pos'] for i in df['tweetContent']
 df_vader_twitter_sentiment_avg = df.resample('60T').mean()
 
 #convert data to a csv file
-df_vader_twitter_sentiment_avg.to_csv('vaderTwitterSentimentData.csv')
+df_vader_twitter_sentiment_avg.to_csv('datasets/finalTwitterSentimentData.csv')
 
 print(df)
 print(df_vader_twitter_sentiment_avg)
