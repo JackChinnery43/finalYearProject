@@ -54,7 +54,7 @@ class BitcoinPrediction:
         self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'SVM Regressor', 'Gradient Boosting Regressor'))
 
     def loadModelData(self):
-        data = pd.read_csv('datasets/combinedData.csv.csv')
+        data = pd.read_csv('datasets/combinedData.csv')
         # store close price and sentiment score in a dataframe
         machine_learning_df = self.data[self.feature_selection]
         # split_data 10% equates to 1329 (10% of 13288)
