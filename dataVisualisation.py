@@ -43,7 +43,7 @@ class BitcoinPrediction:
         return self.original_data
 
     def sentimentAnalysis(self):
-        self.sentiment_data = pd.read_csv('datasets/combinedData.csv.csv', index_col='date')
+        self.sentiment_data = pd.read_csv('datasets/combinedData.csv', index_col='date')
         return self.sentiment_data
 
     def chooseFeatures(self):
