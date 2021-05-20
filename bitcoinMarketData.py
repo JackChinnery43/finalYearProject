@@ -29,10 +29,10 @@ class marketData:
         self.bitcoin_market_data = self.bitcoin_market_data.resample('60T').mean()
 
         # remove columns with non-related data
-        self.bitcoin_market_data.drop(['Timestamp', 'Weighted_Price'], axis=1, inplace=True)
+        self.bitcoin_market_data.drop(['Timestamp', 'Weighted_Price', 'Volume_(BTC)', 'Volume_(Currency)'], axis=1, inplace=True)
 
         # rename required columns
-        self.bitcoin_market_data.columns = ['Open', 'High', 'Low', 'Close', 'Volume_(BTC)', 'Volume_(Currency)']
+        self.bitcoin_market_data.columns = ['Open', 'High', 'Low', 'Close']
 
         # new column to store the high/low %
         self.bitcoin_market_data['%_Change_High_Low'] = (self.bitcoin_market_data['High'] - self.bitcoin_market_data['Low']) / self.bitcoin_market_data['Close'] * 100

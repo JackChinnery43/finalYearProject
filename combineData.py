@@ -45,6 +45,6 @@ plt.ylabel('Bitcoin Close Price')
 plt.legend(['Close Price'], loc='upper left')
 plt.grid()
 plt.tight_layout()
-
+print(" ")
 print(df_combined_data)
 
