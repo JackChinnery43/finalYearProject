@@ -5,7 +5,7 @@ This application looks at the effectiveness of machine learning and natural lang
 File structure:
 
 * datsets folder - the data sets that are used to produce the Bitcoin market price and sentiment scores
-images folder - includes the image of the application high-level view
+* images folder - includes the image of the application high-level view
 
 * Procfile - The terminal command required by Heroku to deploy the application
 * setup.sh - file to configure the server
