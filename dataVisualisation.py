@@ -187,7 +187,7 @@ def main():
     # project data web page
     elif appPages == "Project Data":
         st.write("Bitcoin Market Data: ")
-        st.write("  -  Open, High, Low, Close, %_Change_High_Low, ,%_Change_Open_Close.")
+        st.write("  -  Open, High, Low, Close, %_Change_High_Low, %_Change_Open_Close.")
         st.write("  -  In one minute intervals between 19/05/2018 - 23/11/2019.")
         st.write("  -  Include a column on the high/low percentage, and a column on the percentage change between open/close.")
         st.write(" ")
