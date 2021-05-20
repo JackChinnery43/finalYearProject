@@ -55,7 +55,7 @@ class BitcoinPrediction:
         # method created for selecting the machine learning model
         self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'Support Vector Machine Regressor', 'Gradient Boosting Regressor'))
 
-    def loadModelData(self):
+    def dataSplit(self):
         data = pd.read_csv('datasets/combinedData.csv')
         # set the machine learning variable to equal the user feature selection
         machine_learning_df = self.data[self.feature_selection]
@@ -230,7 +230,7 @@ def main():
         # if statement that shows the predict button if the user has selected one or more features
         if len(controller.feature_selection) >= 1:
             predictButton = st.button('Predict')
-            controller.loadModelData()
+            controller.dataSplit()
             # if user selects predict, run the modelPredictions() function and display the results
             if predictButton:
                 models_predictions_dataframe, model_predictions, models_results, accuracy, data_with_predictions, validation_and_predictions_dataframe, validation_and_predictions_average_dataframe, r2score, meanAbsoluteError, meanSquaredError = controller.modelPredictions(predictButton)
