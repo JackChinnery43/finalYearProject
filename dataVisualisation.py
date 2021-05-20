@@ -53,7 +53,7 @@ class BitcoinPrediction:
 
     def chooseMachineLearningModel(self):
         # method created for selecting the machine learning model
-        self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'SVM Regressor', 'Gradient Boosting Regressor'))
+        self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'Support Vector Machine Regressor', 'Gradient Boosting Regressor'))
 
     def loadModelData(self):
         data = pd.read_csv('datasets/combinedData.csv')
@@ -216,11 +216,11 @@ def main():
             close_price_avg = px.line(controller.sentiment_data['Close'].rolling(window=720).mean())
             close_price_avg.update_layout(width=600, title="Bitcoin Close Price - Monthly Average", legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
             st.plotly_chart(close_price_avg)
-        st.write("Correlational Analysis - key findings: ")
+        st.write("Analysis - key findings: ")
         st.write("  -  In 30th August 2018 the sentiment score begins to decrease, from 0.05, to 0.03 in December 2018. This decrease is matched in Bitcoin's market price, which started at over $6000 in September 2018, and decreased to below $4000 in December 2018.")
         st.write("  -  In January 2019 public sentiment appears to become more positive, with the sentiment score beginning at 0.04 and steadily increasing through to April 2019. Bitcoin's price also begins to slightly increase, from $3000 in January 2019 to around $4000 in April 2019.")
         st.write("  -  In April 2019 public sentiment becomes more positive, increasing continuously until mid-July. This again is matched in Bitcoin's price, which increased from April 2019 to July 2019.")
-        st.write("  -  Both the sentiment score and stock market price begin to drop in August 2019, before picking up again November 2019.")
+        st.write("  -  Both the sentiment score and market price begin to drop in August 2019, before picking up again November 2019.")
 
     # machine learning web page
     elif appPages == "Machine Learning":
