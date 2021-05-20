@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import csv
-from textblob import TextBlob
 import re
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec

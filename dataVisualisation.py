@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import math
-import json
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 import datetime as dt
@@ -47,19 +46,21 @@ class BitcoinPrediction:
         self.sentiment_data = pd.read_csv('datasets/combinedData.csv', index_col='date')
         return self.sentiment_data
 
-    def chooseFeatures(self):
+    def chooseModelFeatures(self):
+        # method created for selecting training features
         features_available = pd.DataFrame(self.data[['Open', 'High', 'Low', 'Close', '%_Change_High_Low', '%_Change_Open_Close', 'compound', 'negative', 'neutral', 'positive']])
         self.feature_selection = st.multiselect("Select the features to be included in the machine learning model", features_available.columns)
 
     def chooseMachineLearningModel(self):
+        # method created for selecting the machine learning model
         self.machine_learning_selection = st.selectbox("Select the machine learning model", ('Linear Regression', 'Random Forest Regression', 'SVM Regressor', 'Gradient Boosting Regressor'))
 
     def loadModelData(self):
         data = pd.read_csv('datasets/combinedData.csv')
-        # store close price and sentiment score in a dataframe
+        # set the machine learning variable to equal the user feature selection
         machine_learning_df = self.data[self.feature_selection]
         # split_data 10% equates to 1329 (10% of 13288)
-        self.split_data = int(math.ceil(len(machine_learning_df) * 0.1)) # equivalent to 10% of the total dataset - this is what is being predicted
+        self.split_data = int(math.ceil(len(machine_learning_df) * 0.1))
         # new column to store the predicted close price
         machine_learning_df['Predicted_Close_Price'] = data['Close'].shift(-self.split_data)
 
@@ -155,14 +156,18 @@ class BitcoinPrediction:
 
         return self.models_predictions_dataframe, self.model_predictions, self.models_results, self.accuracy, self.data_with_predictions, self.validation_and_predictions_dataframe, self.validation_and_predictions_average_dataframe, self.r2Score, self.meanAbsoluteError, self.meanSquaredError
 
+# main method for running the application
 def main():
     controller = BitcoinPrediction()
     controller.data = controller.dataSource()
     controller.sentiment = controller.sentimentAnalysis()
     st.title("Machine Learning - Bitcoin Price Prediction")
-    pathfile = st.sidebar.selectbox("Project Areas", ["Summary", "Project Data", "Sentiment Analysis", "Machine Learning"])
+    # selectbox for choosing which web page to view
+    appPages = st.sidebar.selectbox("Project Areas", ["Summary", "Project Data", "Sentiment Analysis", "Machine Learning"])
 
-    if pathfile == "Summary":
+    # summary web page
+    if appPages == "Summary":
+        # st.write is a Streamlit method to output text to the webpage
         st.write("Project Summary")
         st.write("The effectiveness of machine learning techniques on predicting future financial market prices is increasingly being researched, due to the objective nature and speed of machine learning algorithms at finding patterns and trends in large amounts of data. Because of this, they are frequently being used to influence financial decision making.")
         st.write("Natural Language Processing (NLP) is a branch of artificial intelligence that deals with the interaction between computers and humans using the natural language. Due to its ability to process human words and their context, it is increasingly being used to judge the overall sentiment of large groups of people.")
@@ -174,13 +179,15 @@ def main():
         st.write("  -  Can machine learning and NLP effectively predict future financial market prices?")
         st.write(" ")
         st.write("Project File Structure: ")
+        # streamlit method 'beta_columns' is used to split the page into multiple columns
         image_col1, image_col2, image_col3 = st.beta_columns([1, 4, 1])
         with image_col2:
             st.image('images/projectStructure.png', use_column_width=True)
 
-    elif pathfile == "Project Data":
+    # project data web page
+    elif appPages == "Project Data":
         st.write("Bitcoin Market Data: ")
-        st.write("  -  Open, High, Low, Close, %_Change_High_Low, '%_Change_Open_Close.")
+        st.write("  -  Open, High, Low, Close, %_Change_High_Low, ,%_Change_Open_Close.")
         st.write("  -  In one minute intervals between 19/05/2018 - 23/11/2019.")
         st.write("  -  Include a column on the high/low percentage, and a column on the percentage change between open/close.")
         st.write(" ")
@@ -195,14 +202,17 @@ def main():
         if not st.checkbox("Hide dataframe"):
             hide_dataframe.dataframe(controller.data)
         
-    elif pathfile == "Sentiment Analysis":
+    # sentiment analysis web page
+    elif appPages == "Sentiment Analysis":
         st.write("Sentiment Analysis")
         sentiment_col1, sentiment_col2 = st.beta_columns(2)
         with sentiment_col1:
+            # display average sentiment score
             sentiment_score_avg = px.line(controller.sentiment_data['compound'].rolling(window=720).mean())
             sentiment_score_avg.update_layout(width=600, title="VADER Sentiment Score - Monthly Average", legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
             st.plotly_chart(sentiment_score_avg)
         with sentiment_col2:
+            # display average close market price
             close_price_avg = px.line(controller.sentiment_data['Close'].rolling(window=720).mean())
             close_price_avg.update_layout(width=600, title="Bitcoin Close Price - Monthly Average", legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
             st.plotly_chart(close_price_avg)
@@ -212,27 +222,34 @@ def main():
         st.write("  -  In April 2019 public sentiment becomes more positive, increasing continuously until mid-July. This again is matched in Bitcoin's price, which increased from April 2019 to July 2019.")
         st.write("  -  Both the sentiment score and stock market price begin to drop in August 2019, before picking up again November 2019.")
 
-    elif pathfile == "Machine Learning":
+    # machine learning web page
+    elif appPages == "Machine Learning":
         st.write("Machine Learning")
         controller.chooseMachineLearningModel()
-        controller.chooseFeatures()
+        controller.chooseModelFeatures()
+        # if statement that shows the predict button if the user has selected one or more features
         if len(controller.feature_selection) >= 1:
             predictButton = st.button('Predict')
             controller.loadModelData()
+            # if user selects predict, run the modelPredictions() function and display the results
             if predictButton:
                 models_predictions_dataframe, model_predictions, models_results, accuracy, data_with_predictions, validation_and_predictions_dataframe, validation_and_predictions_average_dataframe, r2score, meanAbsoluteError, meanSquaredError = controller.modelPredictions(predictButton)
+                # display evaluation metrics
                 st.write("Model accuracy on test/train data: ", accuracy * 100, "%")
                 st.write("Model r2 Score for future predictions: ", r2score)
                 st.write("Model Mean Absolute Error for future predictions: ", meanAbsoluteError)
                 st.write("Model Mean Squared Error for future predictions: ", meanSquaredError)
+                # display the model predictions alongside the actual close price
                 model_graph = px.line(data_with_predictions[['Model Results (Predictions)', 'Close', 'Validation (Actual_Close_Price)']])
                 model_graph.update_layout(width=1000, legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
                 st.plotly_chart(model_graph, use_container_width=True)
                 machine_learning_col1, machine_learning_col2 = st.beta_columns((1,2))
                 with machine_learning_col1:
+                    # display the model predictions and actual close price results dataframe
                     st.write("Predictions and Actual Close Price")
                     st.dataframe(validation_and_predictions_dataframe)
                 with machine_learning_col2:
+                    # display the average model prediction
                     model_graph_avg = px.line(validation_and_predictions_average_dataframe)
                     model_graph_avg.update_layout(title="Bitcoin Machine Learning Prediction - 7 day average")
                     st.plotly_chart(model_graph_avg)
