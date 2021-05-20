@@ -107,7 +107,7 @@ class BitcoinPrediction:
             self.models_results.append(self.model_predictions)
             self.accuracy = self.model.score(self.X_test, self.y_test)
 
-        elif self.machine_learning_selection == 'SVM Regressor':
+        elif self.machine_learning_selection == 'Support Vector Machine Regressor':
             self.model_name = SVR()
             self.model = self.model_name.fit(self.X_train, self.y_train)
             # predict the remaining 10% of the total dataset
