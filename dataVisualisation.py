@@ -38,16 +38,17 @@ st.set_page_config(
 
 class BitcoinPrediction:
     def dataSource(self):
-        # original dataset including stock price and sentiment score on an hourly basis - 13288 rows
+        # original dataset including stock price and sentiment score on an hourly basis - 13,288 rows
         self.original_data = pd.read_csv('datasets/combinedData.csv')
         return self.original_data
 
     def sentimentAnalysis(self):
+        # sentiment data method is created separately so that the the index column can be set to the date in order to view 
         self.sentiment_data = pd.read_csv('datasets/combinedData.csv', index_col='date')
         return self.sentiment_data
 
     def chooseFeatures(self):
-        features_available = pd.DataFrame(self.data[['Open', 'High', 'Low', 'Close', 'High/Low_%', '%_Change_Open_Close', 'compound', 'negative', 'neutral', 'positive']])
+        features_available = pd.DataFrame(self.data[['Open', 'High', 'Low', 'Close', '%_Change_High_Low', '%_Change_Open_Close', 'compound', 'negative', 'neutral', 'positive']])
         self.feature_selection = st.multiselect("Select the features to be included in the machine learning model", features_available.columns)
 
     def chooseMachineLearningModel(self):
@@ -144,7 +145,7 @@ class BitcoinPrediction:
         # dataframe storing the model predicted close price and the validation (actual) close price
         self.validation_and_predictions_dataframe = pd.concat([self.models_predictions_dataframe, self.X_features_validation_dataset_series_close], axis=1)
         # dataframe storing the 7 day average model predicted close price and the validation (actual) close price
-        self.validation_and_predictions_average_dataframe = pd.concat([self.model_prediction_dataframe_avg, self.X_features_validation_dataset_series_close_avg], axis=1)
+        self.validation_and_predictions_average_dataframe = pd.concat([self.model_prediction_dataframe_avg, self.X_features_validation_dataset_series_close_avg,], axis=1)
         self.validation_and_predictions_average_dataframe.columns = ['Model Results (Predictions)', 'Validation (Actual_Close_Price)']
 
         # regression evaluation metrics
@@ -168,8 +169,8 @@ def main():
         st.write("Investor sentiment is a major influence on market prices. The combination of machine learning and NLP can therefore potentially be used to influence financial decision making.")
         st.write(" ")
         st.write("This project will aim to answer the following questions: ")
-        st.write("  -  Is there a relationship between public sentiment relating to Bitcoin, and its close market price on any given day?")
-        st.write("  -  Does the semantic value of a tweet relating to a Bictoin improve the accuracy score of machine learning models, when attempting to predict future market prices?")
+        st.write("  -  Is there a relationship between public sentiment relating to Bitcoin, and its close market price?")
+        st.write("  -  Does the semantic value of a tweet relating to Bictoin improve the accuracy score of machine learning models, when attempting to predict future market prices?")
         st.write("  -  Can machine learning and NLP effectively predict future financial market prices?")
         st.write(" ")
         st.write("Project File Structure: ")
@@ -179,7 +180,7 @@ def main():
 
     elif pathfile == "Project Data":
         st.write("Bitcoin Market Data: ")
-        st.write("  -  Open, High, Low, Close, Volume(BTC), Currency(BTC).")
+        st.write("  -  Open, High, Low, Close, %_Change_High_Low, '%_Change_Open_Close.")
         st.write("  -  In one minute intervals between 19/05/2018 - 23/11/2019.")
         st.write("  -  Include a column on the high/low percentage, and a column on the percentage change between open/close.")
         st.write(" ")
@@ -224,7 +225,7 @@ def main():
                 st.write("Model r2 Score for future predictions: ", r2score)
                 st.write("Model Mean Absolute Error for future predictions: ", meanAbsoluteError)
                 st.write("Model Mean Squared Error for future predictions: ", meanSquaredError)
-                model_graph = px.line(data_with_predictions[['Close', 'Validation (Actual_Close_Price)', 'Model Results (Predictions)']])
+                model_graph = px.line(data_with_predictions[['Model Results (Predictions)', 'Close', 'Validation (Actual_Close_Price)']])
                 model_graph.update_layout(width=1000, legend=dict(yanchor="top",y=0.99,xanchor="left",x=0.01))
                 st.plotly_chart(model_graph, use_container_width=True)
                 machine_learning_col1, machine_learning_col2 = st.beta_columns((1,2))
